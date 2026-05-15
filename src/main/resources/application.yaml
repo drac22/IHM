@@ -1,3 +1,12 @@
 spring:
   application:
     name: project
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/project_ihm
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
