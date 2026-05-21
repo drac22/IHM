@@ -12,13 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Entity
 @Table(name = "usuario_roles", uniqueConstraints = {
@@ -44,4 +44,9 @@ public class UsuarioRoles {
 
     @Column(name = "fecha_asignacion")
     private LocalDateTime fechaAsignacion;
+
+    @PrePersist
+    public void prePersist() {
+        fechaAsignacion = LocalDateTime.now(); // Establece la fecha de asignación al momento de crear la relación
+    }
 }

@@ -10,12 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ihm.project.model.tbl_intermedias.UsuarioRoles;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,14 +41,14 @@ public class Usuario implements UserDetails {
     private String celular;
     private LocalDateTime fechaCreacion;
 
-    @OneToMany(mappedBy = "usuario" ,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UsuarioRoles> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-            .map(rol -> new SimpleGrantedAuthority(rol.getRol().getName()))
-            .toList();
+                .map(rol -> new SimpleGrantedAuthority(rol.getRol().getName()))
+                .toList();
     }
 
     @Override
@@ -57,5 +59,10 @@ public class Usuario implements UserDetails {
     @Override
     public String getPassword() {
         return this.password;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        fechaCreacion = LocalDateTime.now(); // Establece la fecha de creación
     }
 }

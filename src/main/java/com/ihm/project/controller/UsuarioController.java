@@ -11,50 +11,61 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ihm.project.dto.UsuarioCreateRequestDto;
-import com.ihm.project.dto.UsuarioResponseDto;
-import com.ihm.project.dto.UsuarioUpdateRequestDto;
+import com.ihm.project.dto.usuario.UsuarioCreateRequestDto;
+import com.ihm.project.dto.usuario.UsuarioResponseDto;
+import com.ihm.project.dto.usuario.UsuarioUpdateRequestDto;
 import com.ihm.project.service.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/usuario")
 @RequiredArgsConstructor
 @Tag(name = "Usuarios", description = "Controlador para la gestión completa de usuarios del sistema")
 public class UsuarioController {
 
     private final UsuarioService usuarioServ;
 
+    // PARA ADMINISTRADORES
+    @Operation(summary = "Obtener los Usuarios")
     @GetMapping()
     ResponseEntity<List<UsuarioResponseDto>> findAllUsuarios() {
         return ResponseEntity.ok(usuarioServ.findAll());
     }
 
+    // PARA ADMINISTRADORES
     @Operation(summary = "Obtener usuario por ID", description = "Busca un usuario en la base de datos utilizando su identificador único y devuelve sus datos detallados.")
     @GetMapping("/{id}")
     ResponseEntity<Optional<UsuarioResponseDto>> findUsuarioById(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioServ.findById(id));
     }
 
+    // PARA ADMINISTRADORES
+    @Operation(summary = "Crear Usuario")
     @PostMapping()
-    ResponseEntity<UsuarioResponseDto> createUsuario(@RequestBody UsuarioCreateRequestDto requestDto) {
+    ResponseEntity<UsuarioResponseDto> createUsuario(@RequestBody @Valid UsuarioCreateRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioServ.save(requestDto));
     }
 
+    // PARA ADMINISTRADORES
+    @Operation(summary = "Eliminar Usuario por ID")
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUsuarioById(@PathVariable Long id) {
+        usuarioServ.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    // PARA ADMINISTRADORES
+    @Operation(summary = "Modificar Usuario")
     @PutMapping("/{id}")
     ResponseEntity<UsuarioResponseDto> updatedUsuario(@PathVariable Long id,
-            @RequestBody UsuarioUpdateRequestDto requestDto) {
+            @RequestBody @Valid UsuarioUpdateRequestDto requestDto) {
         return ResponseEntity.ok(usuarioServ.update(id, requestDto));
     }
 
