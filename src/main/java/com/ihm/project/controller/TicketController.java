@@ -46,6 +46,13 @@ public class TicketController {
         return ResponseEntity.ok(ticketServ.findById(id));
     }
 
+    // PARA ADMINISTRADORES
+    @Operation(summary = "Obtener tickets por ID de Usuario", description = "Busca tickets utilizando el identificador único de un usuario")
+    @GetMapping("/usuario/{userId}")
+    ResponseEntity<List<TicketResponseDto>> findTicketsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(ticketServ.findByIdUsuarioAsignado(userId));
+    }
+
     // PARA EL USUARIO AUTENTICADO
     @Operation(summary = "Obtener mis tickets", description = "Mis tickets asignados")
     @GetMapping("/my-tickets")

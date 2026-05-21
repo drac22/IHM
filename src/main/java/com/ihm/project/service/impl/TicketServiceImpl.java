@@ -42,11 +42,9 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public List<TicketResponseDto> findMyTickets() {
-        return ticketRepository.findAll().stream().filter(ticket -> {
-            return ticket.getCreadoPor()
-                    .getId() == ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                            .getId();
-        }).map(ticketMapper::toDto).toList();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ticketRepository.findByUsuarioAsignadoId(usuario.getId()).stream().map(ticketMapper::toDto).toList();
     }
 
     @Override
@@ -105,5 +103,8 @@ public class TicketServiceImpl implements TicketService {
 
             throw new RuntimeException("No tienes permisos para culminar este ticket porque no te está asignado.");
         }
+        ticket.setEstado(Estado.RESUELTO);
+        ticket.setFechaCulminacion(LocalDateTime.now());
+        ticketRepository.save(ticket);
     }
 }
