@@ -3,27 +3,34 @@ package com.ihm.project.jwt;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
-
 import javax.crypto.SecretKey;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import com.ihm.project.model.Usuario;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
     private String SECRET_KEY = "0ilrCVSrBZbFu1I5U4JKyogKcd79CLgIdLjteTL4svU";
-    private long expiration = 600L;
+    
+    private long expiration = 600L; 
+    private long refreshExpiration = 604800L; 
 
     public String generateToken(Usuario usuario) {
+        return buildToken(usuario, expiration);
+    }
+
+    public String generateRefreshToken(Usuario usuario) {
+        return buildToken(usuario, refreshExpiration);
+    }
+
+    private String buildToken(Usuario usuario, long expirationTime) {
         return Jwts.builder()
-                .setSubject(usuario.getUsername())
+                .setSubject(usuario.getEmail()) 
                 .setIssuedAt(new Date())
-                .setExpiration(Date.from(Instant.now().plusSeconds(expiration)))
+                .setExpiration(Date.from(Instant.now().plusSeconds(expirationTime)))
                 .signWith(getKey())
                 .compact();
     }
@@ -44,5 +51,4 @@ public class JwtService {
     private SecretKey getKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
-
 }
