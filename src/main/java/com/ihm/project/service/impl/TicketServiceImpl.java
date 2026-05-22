@@ -13,6 +13,7 @@ import com.ihm.project.dto.ticket.TicketCreateRequestDto;
 import com.ihm.project.dto.ticket.TicketResponseDto;
 import com.ihm.project.enums.Estado;
 import com.ihm.project.enums.Prioridad;
+import com.ihm.project.exceptions.ResourceNotFoundException;
 import com.ihm.project.mapper.TicketMapper;
 import com.ihm.project.model.Ticket;
 import com.ihm.project.model.Usuario;
@@ -60,7 +61,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void deleteById(Long id) {
         if (!ticketRepository.existsById(id)) {
-            throw new RuntimeException("No se encontró el ticket con ID: " + id);
+            throw new ResourceNotFoundException("No se encontró el ticket con ID: " + id);
         }
         ticketRepository.deleteById(id);
     }
