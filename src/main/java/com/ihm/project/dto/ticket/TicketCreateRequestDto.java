@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class TicketCreateRequestDto {
-    @NotBlank(message = "El título no puede estar vacío")
+    @NotBlank(message = "El título no puede estar vacío.")
     private String titulo;
-    @NotBlank(message = "La descripción no puede estar vacía")
+    @NotBlank(message = "La descripción no puede estar vacía.")
     private String descripcion;
-    @NotNull(message = "La prioridad no puede estar vacía")
+    @NotNull(message = "La prioridad no puede estar vacía.")
     private Long categoriaId;
 }

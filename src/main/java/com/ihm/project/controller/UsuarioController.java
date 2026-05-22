@@ -43,7 +43,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioServ.findAll());
     }
 
-    // PARA ADMINISTRADORES
+    // PARA ROL ADMINISTRADOR
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener usuario por ID", description = "Busca un usuario en la base de datos utilizando su identificador único y devuelve sus datos detallados.")
     @GetMapping("/{id}")
@@ -51,7 +51,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioServ.findById(id));
     }
 
-    // PARA ADMINISTRADORES
+    // PARA ROL ADMINISTRADORES
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear Usuario")
     @PostMapping()
@@ -59,7 +59,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioServ.save(requestDto));
     }
 
-    // PARA ADMINISTRADORES
+    // PARA ROL ADMINISTRADOR
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar Usuario por ID")
     @DeleteMapping("/{id}")
@@ -68,7 +68,7 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    // PARA ADMINISTRADORES
+    // PARA ROL ADMINISTRADOR
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Modificar Usuario")
     @PutMapping("/{id}")
