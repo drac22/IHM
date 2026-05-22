@@ -41,7 +41,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<TicketResponseDto> findMyTickets() {
+    public List<TicketResponseDto> findMyTicketsCreados() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ticketRepository.findByCreadoPorId(usuario.getId()).stream().map(ticketMapper::toDto).toList();
+    }
+
+    @Override
+    public List<TicketResponseDto> findMyTicketsAsignados() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuario = (Usuario) authentication.getPrincipal();
         return ticketRepository.findByUsuarioAsignadoId(usuario.getId()).stream().map(ticketMapper::toDto).toList();
@@ -59,10 +66,25 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void deleteById(Long id) {
-        if (!ticketRepository.existsById(id)) {
-            throw new RuntimeException("No se encontró el ticket con ID: " + id);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró el ticket con ID: " + id));
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        boolean isAdmin = usuario.getRoles().stream()
+                .anyMatch(role -> role.getRol()
+                        .getName()
+                        .equals("ROLE_ADMIN"));
+        boolean isOwner = ticket.getCreadoPor()
+                .getId()
+                .equals(usuario.getId());
+        if (!isAdmin && !isOwner) {
+            throw new RuntimeException(
+                    "No puedes eliminar este ticket");
         }
-        ticketRepository.deleteById(id);
+        ticketRepository.delete(ticket);
     }
 
     @Override

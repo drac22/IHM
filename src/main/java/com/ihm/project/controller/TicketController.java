@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class TicketController {
     private final TicketService ticketServ;
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener todos los tickets")
     @GetMapping()
     ResponseEntity<List<TicketResponseDto>> findAllTickets() {
@@ -40,6 +42,7 @@ public class TicketController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener ticket por ID", description = "Busca un ticket utilizando su identificador único")
     @GetMapping("/{id}")
     ResponseEntity<Optional<TicketResponseDto>> findTicketById(@PathVariable Long id) {
@@ -47,20 +50,31 @@ public class TicketController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener tickets por ID de Usuario", description = "Busca tickets utilizando el identificador único de un usuario")
     @GetMapping("/usuario/{userId}")
     ResponseEntity<List<TicketResponseDto>> findTicketsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(ticketServ.findByIdUsuarioAsignado(userId));
     }
 
-    // PARA EL USUARIO AUTENTICADO
-    @Operation(summary = "Obtener mis tickets", description = "Mis tickets asignados")
+    // PARA EL TI AUTENTICADO
+    @PreAuthorize("hasRole('TI')")
+    @Operation(summary = "Obtener mis tickets asignados", description = "Mis tickets asignados")
     @GetMapping("/my-tickets")
-    ResponseEntity<List<TicketResponseDto>> findMyTicket() {
-        return ResponseEntity.ok(ticketServ.findMyTickets());
+    ResponseEntity<List<TicketResponseDto>> findMyTicketAsignados() {
+        return ResponseEntity.ok(ticketServ.findMyTicketsAsignados());
     }
 
     // PARA EL USUARIO AUTENTICADO
+    @PreAuthorize("hasRole('USER')")
+    @Operation(summary = "Obtener mis tickets creados", description = "Mis tickets creados")
+    @GetMapping("/my-tickets-created")
+    ResponseEntity<List<TicketResponseDto>> findMyTicketCreados() {
+        return ResponseEntity.ok(ticketServ.findMyTicketsCreados());
+    }
+
+    // PARA EL USUARIO AUTENTICADO
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "Crear Ticket")
     @PostMapping()
     ResponseEntity<TicketResponseDto> createTicket(@RequestBody @Valid TicketCreateRequestDto requestDto) {
@@ -68,6 +82,7 @@ public class TicketController {
     }
 
     // PARA ADMINISTRADORES y USUARIOS, PERO SOLO PARA SUS PROPIOS TICKETS, FALTA IMPLEMENTAR VALIDACION
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('USER')")
     @Operation(summary = "Eliminar Ticket por ID")
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteTicketById(@PathVariable Long id) {
@@ -76,6 +91,7 @@ public class TicketController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Asignacion de los tickets", description = "Permite asignar un ticket a un usuario y establecer su prioridad")
     @PutMapping("/{id}/asignacion")
     public ResponseEntity<String> asignarTicket(
@@ -86,6 +102,7 @@ public class TicketController {
     }
 
     // PARA USUARIO CON ROL TECNICO
+    @PreAuthorize("hasRole('TI')")
     @Operation(summary = "Culminar ticket", description = "Permite culminar un ticket")
     @PutMapping("/{id}/culminar")
     public ResponseEntity<String> culminarTicket(
