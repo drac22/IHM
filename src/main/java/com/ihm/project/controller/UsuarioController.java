@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +36,7 @@ public class UsuarioController {
     private final UsuarioService usuarioServ;
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener los Usuarios")
     @GetMapping()
     ResponseEntity<List<UsuarioResponseDto>> findAllUsuarios() {
@@ -40,6 +44,7 @@ public class UsuarioController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener usuario por ID", description = "Busca un usuario en la base de datos utilizando su identificador único y devuelve sus datos detallados.")
     @GetMapping("/{id}")
     ResponseEntity<Optional<UsuarioResponseDto>> findUsuarioById(@PathVariable Long id) {
@@ -47,6 +52,7 @@ public class UsuarioController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear Usuario")
     @PostMapping()
     ResponseEntity<UsuarioResponseDto> createUsuario(@RequestBody @Valid UsuarioCreateRequestDto requestDto) {
@@ -54,6 +60,7 @@ public class UsuarioController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar Usuario por ID")
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUsuarioById(@PathVariable Long id) {
@@ -62,6 +69,7 @@ public class UsuarioController {
     }
 
     // PARA ADMINISTRADORES
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Modificar Usuario")
     @PutMapping("/{id}")
     ResponseEntity<UsuarioResponseDto> updatedUsuario(@PathVariable Long id,

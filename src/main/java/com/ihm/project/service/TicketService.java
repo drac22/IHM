@@ -14,7 +14,9 @@ public interface TicketService {
 
     List<TicketResponseDto> findByIdUsuarioAsignado(Long userId);
 
-    List<TicketResponseDto> findMyTickets();
+    List<TicketResponseDto> findMyTicketsCreados();
+
+    List<TicketResponseDto> findMyTicketsAsignados();
 
     TicketResponseDto save(TicketCreateRequestDto request);
 
