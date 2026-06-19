@@ -30,8 +30,8 @@ Request:
 
 ```json
 {
-  "email": "admin@ihm.local",
-  "password": "Admin123*"
+  "identifier": "admin",
+  "password": "admin"
 }
 ```
 
@@ -45,9 +45,15 @@ Response:
 
 ## Usuarios de desarrollo
 
-- `admin@ihm.local` / `Admin123*`
-- `ti@ihm.local` / `Ti123456*`
-- `user@ihm.local` / `User1234*`
+- `admin@gmail.com` / `admin`
+- `tecnico@gmail.com` / `tecnico`
+- `usuario@gmail.com` / `usuario`
+
+## Usuarios de acceso
+
+- `admin`
+- `tecnico`
+- `usuario`
 
 ## Endpoints publicos
 
@@ -92,7 +98,7 @@ Response:
 {
   "apellido": "IHM",
   "celular": "999111222",
-  "email": "admin@ihm.local",
+  "email": "admin@gmail.com",
   "id": 1,
   "nombre": "Admin",
   "roles": ["ROLE_ADMIN"]
@@ -106,7 +112,7 @@ Response:
   {
     "apellido": "IHM",
     "celular": "999111222",
-    "email": "admin@ihm.local",
+    "email": "admin@gmail.com",
     "id": 1,
     "nombre": "Admin",
     "roles": ["ROLE_ADMIN"]
@@ -114,7 +120,7 @@ Response:
   {
     "apellido": "Tecnico",
     "celular": "999111333",
-    "email": "ti@ihm.local",
+    "email": "tecnico@gmail.com",
     "id": 2,
     "nombre": "Soporte",
     "roles": ["ROLE_TI"]
@@ -122,7 +128,7 @@ Response:
   {
     "apellido": "Final",
     "celular": "999111444",
-    "email": "user@ihm.local",
+    "email": "usuario@gmail.com",
     "id": 3,
     "nombre": "Usuario",
     "roles": ["ROLE_USER"]
@@ -135,30 +141,42 @@ Response:
 ```json
 [
   {
-    "categoria": "Hardware",
-    "creadoPor": "Usuario",
+    "id": 1,
+    "titulo": "Prueba desde Insomnia",
     "descripcion": "Primer ticket de prueba",
-    "estado": "PENDIENTE",
+    "fechaRegistro": "2026-06-18 10:07:29",
     "fechaAsignacion": null,
     "fechaCulminacion": null,
-    "fechaRegistro": "2026-06-18 10:07:29",
-    "id": 1,
     "prioridad": null,
-    "titulo": "Prueba desde Insomnia",
-    "usuarioAsignado": null
+    "estado": "PENDIENTE",
+    "categoria": {
+      "id": 1,
+      "nombre": "Hardware"
+    },
+    "usuarioAsignado": null,
+    "creadoPor": {
+      "id": 3,
+      "nombre": "Usuario"
+    }
   },
   {
-    "categoria": "Hardware",
-    "creadoPor": "Admin",
+    "id": 33,
+    "titulo": "Prueba desde Insomnia",
     "descripcion": "Segundo ticket de prueba",
-    "estado": "PENDIENTE",
+    "fechaRegistro": "2026-06-18 10:38:38",
     "fechaAsignacion": null,
     "fechaCulminacion": null,
-    "fechaRegistro": "2026-06-18 10:38:38",
-    "id": 33,
     "prioridad": null,
-    "titulo": "Prueba desde Insomnia",
-    "usuarioAsignado": null
+    "estado": "PENDIENTE",
+    "categoria": {
+      "id": 1,
+      "nombre": "Hardware"
+    },
+    "usuarioAsignado": null,
+    "creadoPor": {
+      "id": 1,
+      "nombre": "Admin"
+    }
   }
 ]
 ```
@@ -191,6 +209,8 @@ Ejemplo esperado:
 
 `POST /api/v1/ticket`
 
+Request:
+
 ```json
 {
   "titulo": "Error de acceso",
@@ -198,6 +218,53 @@ Ejemplo esperado:
   "categoriaId": 1
 }
 ```
+
+Response `201 Created`:
+
+```json
+{
+  "id": 34,
+  "titulo": "Error de acceso",
+  "descripcion": "No puedo entrar al sistema",
+  "fechaRegistro": "2026-06-19 09:15:20",
+  "fechaAsignacion": null,
+  "fechaCulminacion": null,
+  "prioridad": null,
+  "estado": "PENDIENTE",
+  "categoria": {
+    "id": 1,
+    "nombre": "Hardware"
+  },
+  "usuarioAsignado": null,
+  "creadoPor": {
+    "id": 3,
+    "nombre": "Usuario"
+  }
+}
+```
+
+Errores de validacion `400 Bad Request`:
+
+```json
+{
+  "timestamp": "2026-06-19T09:16:10",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "La solicitud contiene datos invalidos.",
+  "path": "/api/v1/ticket",
+  "validationErrors": {
+    "titulo": "El titulo debe tener entre 5 y 120 caracteres.",
+    "descripcion": "La descripcion debe tener entre 10 y 1000 caracteres."
+  }
+}
+```
+
+Notas para frontend:
+
+- El formulario de creacion solo necesita `titulo`, `descripcion` y `categoriaId`.
+- `estado`, `prioridad`, `usuarioAsignado` y fechas no se envian en el alta; los define el backend.
+- Para poblar el selector de categoria usa `GET /api/v1/categoria`.
+- Despues de crear, el backend responde con el ticket completo y header `Location: /api/v1/ticket/{id}`.
 
 ### Asignar ticket
 

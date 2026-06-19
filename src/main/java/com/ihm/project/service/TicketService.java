@@ -18,7 +18,7 @@ public interface TicketService {
 
     List<TicketResponseDto> findMyTicketsAsignados();
 
-    TicketResponseDto save(TicketCreateRequestDto request);
+    TicketResponseDto createTicket(TicketCreateRequestDto request);
 
     void deleteById(Long id);
 
