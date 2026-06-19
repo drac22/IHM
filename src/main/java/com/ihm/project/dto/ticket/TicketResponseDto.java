@@ -16,7 +16,7 @@ public class TicketResponseDto {
     private String fechaCulminacion;
     private String prioridad;
     private String estado;
-    private String categoria;
-    private String usuarioAsignado;
-    private String creadoPor;
+    private TicketCategoryDto categoria;
+    private TicketUserDto usuarioAsignado;
+    private TicketUserDto creadoPor;
 }

@@ -1,5 +1,6 @@
 package com.ihm.project.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ihm.project.dto.ticket.AsignacionRequestDto;
 import com.ihm.project.dto.ticket.TicketCreateRequestDto;
@@ -25,91 +28,87 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
 @RequiredArgsConstructor
-@Tag(name = "Tickets", description = "Controlador para la gestión completa de tickets del sistema")
+@Tag(name = "Tickets", description = "Controlador para la gestion completa de tickets del sistema")
 public class TicketController {
 
-    private final TicketService ticketServ;
+    private final TicketService ticketService;
 
-    // USUARIO: ver tickets que él creó
     @Operation(summary = "Obtener mis tickets creados", description = "Mis tickets creados")
     @GetMapping("/my-tickets-created")
     ResponseEntity<List<TicketResponseDto>> findMyTicketCreados() {
         requireAnyRole("ROLE_USER", "ROLE_ADMIN");
-        return ResponseEntity.ok(ticketServ.findMyTicketsCreados());
+        return ResponseEntity.ok(ticketService.findMyTicketsCreados());
     }
 
-    // TI: ver tickets que tiene asignados
     @Operation(summary = "Obtener mis tickets asignados", description = "Mis tickets asignados")
     @GetMapping("/my-tickets")
     ResponseEntity<List<TicketResponseDto>> findMyTicketAsignados() {
         requireAnyRole("ROLE_TI", "ROLE_ADMIN");
-        return ResponseEntity.ok(ticketServ.findMyTicketsAsignados());
+        return ResponseEntity.ok(ticketService.findMyTicketsAsignados());
     }
 
-    // ADMIN: obtener tickets por ID de usuario
-    @Operation(summary = "Obtener tickets por ID de Usuario", description = "Busca tickets utilizando el identificador único de un usuario")
+    @Operation(summary = "Obtener tickets por ID de usuario",
+            description = "Busca tickets utilizando el identificador unico de un usuario")
     @GetMapping("/usuario/{userId}")
     ResponseEntity<List<TicketResponseDto>> findTicketsByUserId(@PathVariable Long userId) {
         requireAnyRole("ROLE_ADMIN");
-        return ResponseEntity.ok(ticketServ.findByIdUsuarioAsignado(userId));
+        return ResponseEntity.ok(ticketService.findByIdUsuarioAsignado(userId));
     }
 
-    // ADMIN: obtener todos los tickets
     @Operation(summary = "Obtener todos los tickets")
     @GetMapping
     ResponseEntity<List<TicketResponseDto>> findAllTickets() {
         requireAnyRole("ROLE_ADMIN");
-        return ResponseEntity.ok(ticketServ.findAll());
+        return ResponseEntity.ok(ticketService.findAll());
     }
 
-    // ADMIN: obtener ticket por ID
-    // Va después de /my-tickets-created, /my-tickets y /usuario/{userId}
-    @Operation(summary = "Obtener ticket por ID", description = "Busca un ticket utilizando su identificador único")
+    @Operation(summary = "Obtener ticket por ID", description = "Busca un ticket utilizando su identificador unico")
     @GetMapping("/{id}")
     ResponseEntity<Optional<TicketResponseDto>> findTicketById(@PathVariable Long id) {
         requireAnyRole("ROLE_ADMIN");
-        return ResponseEntity.ok(ticketServ.findById(id));
+        return ResponseEntity.ok(ticketService.findById(id));
     }
 
-    // USER o ADMIN: crear ticket
-    @Operation(summary = "Crear Ticket")
+    @Operation(summary = "Crear ticket")
     @PostMapping
     ResponseEntity<TicketResponseDto> createTicket(@RequestBody @Valid TicketCreateRequestDto requestDto) {
         requireAnyRole("ROLE_USER", "ROLE_ADMIN");
-        return ResponseEntity.status(HttpStatus.CREATED).body(ticketServ.save(requestDto));
+        TicketResponseDto createdTicket = ticketService.createTicket(requestDto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdTicket.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(createdTicket);
     }
 
-    // ADMIN o USER: eliminar ticket
-    @Operation(summary = "Eliminar Ticket por ID")
+    @Operation(summary = "Eliminar ticket por ID")
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteTicketById(@PathVariable Long id) {
         requireAnyRole("ROLE_ADMIN", "ROLE_USER");
-        ticketServ.deleteById(id);
+        ticketService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ADMIN: asignar ticket
-    @Operation(summary = "Asignacion de los tickets", description = "Permite asignar un ticket a un usuario y establecer su prioridad")
+    @Operation(summary = "Asignacion de tickets",
+            description = "Permite asignar un ticket a un usuario y establecer su prioridad")
     @PutMapping("/{id}/asignacion")
     public ResponseEntity<String> asignarTicket(
             @PathVariable Long id,
             @RequestBody AsignacionRequestDto requestDto) {
         requireAnyRole("ROLE_ADMIN");
-        ticketServ.asignacionTicket(requestDto, id);
+        ticketService.asignacionTicket(requestDto, id);
         return ResponseEntity.ok("Ticket asignado correctamente.");
     }
 
-    // TI o ADMIN: culminar ticket
     @Operation(summary = "Culminar ticket", description = "Permite culminar un ticket")
     @PutMapping("/{id}/culminar")
     public ResponseEntity<String> culminarTicket(@PathVariable Long id) {
         requireAnyRole("ROLE_TI", "ROLE_ADMIN");
-        ticketServ.culminarTicket(id);
+        ticketService.culminarTicket(id);
         return ResponseEntity.ok("Ticket culminado correctamente.");
     }
 

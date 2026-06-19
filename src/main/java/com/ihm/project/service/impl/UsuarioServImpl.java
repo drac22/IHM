@@ -43,15 +43,20 @@ public class UsuarioServImpl implements UsuarioService {
     @Transactional
     @Override
     public UsuarioResponseDto save(UsuarioCreateRequestDto request) {
+        String normalizedEmail = normalize(request.getEmail());
+        String generatedUsername = extractUsername(normalizedEmail);
 
-        if (usuarioRepo.existsByEmail(request.getEmail())) {
+        if (usuarioRepo.existsByEmail(normalizedEmail)) {
             throw new RuntimeException("Email ya registrado");
+        }
+        if (usuarioRepo.existsByUsername(generatedUsername)) {
+            throw new RuntimeException("Nombre de usuario ya registrado");
         }
 
         Usuario usuarioCreated = usuarioMapper.toEntity(request);
-
-        usuarioCreated.setPassword(
-                passwordEncoder.encode(request.getPassword()));
+        usuarioCreated.setEmail(normalizedEmail);
+        usuarioCreated.setUsername(generatedUsername);
+        usuarioCreated.setPassword(passwordEncoder.encode(request.getPassword()));
 
         List<UsuarioRoles> roles = request.getRoles().stream()
                 .map(roleName -> {
@@ -66,7 +71,6 @@ public class UsuarioServImpl implements UsuarioService {
         usuarioCreated.setRoles(roles);
 
         Usuario usuarioSave = usuarioRepo.save(usuarioCreated);
-
         return usuarioMapper.toDto(usuarioSave);
     }
 
@@ -85,5 +89,14 @@ public class UsuarioServImpl implements UsuarioService {
             Usuario usuarioSaved = usuarioRepo.save(usuarioExist);
             return usuarioMapper.toDto(usuarioSaved);
         }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    private String normalize(String value) {
+        return value == null ? null : value.trim().toLowerCase();
+    }
+
+    private String extractUsername(String email) {
+        int separatorIndex = email.indexOf('@');
+        return separatorIndex > 0 ? email.substring(0, separatorIndex) : email;
     }
 }

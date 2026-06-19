@@ -1,6 +1,7 @@
 package com.ihm.project.dto.auth;
 
-import jakarta.validation.constraints.Email;
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +11,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class LoginRequest {
-    @Email
     @NotBlank
-    private String email;
+    @JsonAlias({ "email", "username" })
+    private String identifier;
 
     @NotBlank
     private String password;

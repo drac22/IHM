@@ -34,6 +34,7 @@ public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String username;
     private String email;
     private String password;
     private String nombre;
@@ -47,13 +48,13 @@ public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-            .map(rol -> new SimpleGrantedAuthority(rol.getRol().getName()))
-            .toList();
+                .map(rol -> new SimpleGrantedAuthority(rol.getRol().getName()))
+                .toList();
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
 
     @Override
@@ -63,6 +64,6 @@ public class Usuario implements UserDetails {
 
     @PrePersist
     public void prePersist() {
-        fechaCreacion = LocalDateTime.now(); // Establece la fecha de creación
+        fechaCreacion = LocalDateTime.now();
     }
 }
