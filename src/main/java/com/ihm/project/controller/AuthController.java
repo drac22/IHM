@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ihm.project.dto.auth.AuthResponse;
 import com.ihm.project.dto.auth.LoginRequest;
 import com.ihm.project.jwt.JwtService;
+import com.ihm.project.mapper.UsuarioMapper;
 import com.ihm.project.model.Usuario;
 
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UsuarioMapper usuarioMapper;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -42,7 +44,7 @@ public class AuthController {
             String token = jwtService.generateToken(usuario);
 
             return ResponseEntity.ok(
-                    new AuthResponse(token));
+                    new AuthResponse(token, usuarioMapper.toDto(usuario)));
 
         } catch (BadCredentialsException e) {
 
