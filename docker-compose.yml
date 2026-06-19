@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: mysql:8.0
@@ -17,7 +15,7 @@ services:
       retries: 5
     volumes:
       - db_data:/var/lib/mysql
-      - ./seed.db:/docker-entrypoint-initdb.d/seed.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
 
   app:
     build: .
@@ -28,6 +26,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ihm_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ihm_user
       SPRING_DATASOURCE_PASSWORD: ihm_pass
+      SPRING_PROFILES_ACTIVE: dev
     ports:
       - "8080:8080"
     restart: unless-stopped

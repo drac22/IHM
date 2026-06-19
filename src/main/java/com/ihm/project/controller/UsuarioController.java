@@ -35,6 +35,18 @@ public class UsuarioController {
 
     private final UsuarioService usuarioServ;
 
+    @Operation(summary = "Obtener usuario autenticado")
+    @GetMapping("/me")
+    ResponseEntity<UsuarioResponseDto> findCurrentUsuario() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return usuarioServ.findAll().stream()
+                .filter(usuario -> usuario.getEmail().equals(email))
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // PARA ADMINISTRADORES
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Obtener los Usuarios")
