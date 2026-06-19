@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: mysql:8.0
@@ -17,7 +15,7 @@ services:
       retries: 5
     volumes:
       - db_data:/var/lib/mysql
-      - ./seed.db:/docker-entrypoint-initdb.d/seed.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
 
   app:
     build: .

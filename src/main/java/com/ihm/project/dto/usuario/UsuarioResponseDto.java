@@ -1,5 +1,7 @@
 package com.ihm.project.dto.usuario;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +15,5 @@ public class UsuarioResponseDto {
     private String nombre;
     private String apellido;
     private String celular;
+    private List<String> roles;
 }
