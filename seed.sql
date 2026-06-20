@@ -37,6 +37,16 @@ CREATE TABLE IF NOT EXISTS usuario_roles (
     FOREIGN KEY (rol_id) REFERENCES rol(id)
 );
 
+CREATE TABLE IF NOT EXISTS sugerencia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo VARCHAR(50) NOT NULL,
+    mensaje TEXT NOT NULL,
+    estado VARCHAR(20) DEFAULT 'Pendiente',
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+);
+
 -- Insert seed data
 INSERT INTO rol (id, name) VALUES
 (1, 'ROLE_ADMIN'),
@@ -60,3 +70,8 @@ INSERT INTO usuario (apellido, celular, fecha_creacion, email, nombre, password)
 
 INSERT INTO usuario_roles (usuario_id, rol_id, fecha_asignacion) VALUES
 (1, 1, NOW());
+
+INSERT INTO sugerencia (tipo, mensaje, estado, fecha_creacion, usuario_id) VALUES
+('Mejora', 'Me gustaría que la interfaz tenga un modo oscuro', 'Pendiente', NOW(), 1),
+('Comentario', 'Excelente sistema, muy intuitivo', 'Revisado', NOW(), 1),
+('Preferencia', 'Prefiero recibir notificaciones por correo en lugar de SMS', 'Pendiente', NOW(), null);
