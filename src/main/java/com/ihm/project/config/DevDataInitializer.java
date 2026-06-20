@@ -183,6 +183,13 @@ public class DevDataInitializer {
     }
 
     private List<UsuarioRoles> resolveRoles(Usuario usuario, Rol role) {
+        if (usuario.getRoles() != null && !usuario.getRoles().isEmpty()) {
+            boolean alreadyHasRole = usuario.getRoles().stream()
+                    .anyMatch(ur -> ur.getRol().getName().equals(role.getName()));
+            if (alreadyHasRole) {
+                return usuario.getRoles();
+            }
+        }
         return List.of(buildUserRole(usuario, role));
     }
 
