@@ -17,7 +17,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
     private String SECRET_KEY = "0ilrCVSrBZbFu1I5U4JKyogKcd79CLgIdLjteTL4svU";
-    private long expiration = 600L;
+    private long expiration = 2000L; // 24 hours in seconds
 
     public String generateToken(Usuario usuario) {
         return Jwts.builder()
